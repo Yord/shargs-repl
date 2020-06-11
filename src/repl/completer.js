@@ -35,11 +35,11 @@ function getMatches (opts, subcommands, rest) {
       if (rest.length === 0) {
         return args
       } else {
-        const foo = rest[0]
+        const partialArg = rest[0]
 
-        if (args.includes(foo)) return only
+        if (args.includes(partialArg)) return only
 
-        const started = args.filter(arg => arg.startsWith(foo))
+        const started = args.filter(arg => arg.startsWith(partialArg))
         if (started.length > 0) return started
         else return []
       }

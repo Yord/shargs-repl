@@ -198,3 +198,21 @@ test('getMatches uses only to complete value of array option in subcommands', ()
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns all cmd args and pos args on --', () => {
+  const line = 'Cat --jet A --lot --'
+
+  const values = [
+    {...Cat, values: [
+      {...jet, values: ['A']},
+      {...lot, values: [1]},
+      {values: ['--']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', '<3>', '<4> <5>', 'INK'], line]
+
+  expect(res).toStrictEqual(exp)
+})

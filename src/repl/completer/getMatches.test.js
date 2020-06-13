@@ -63,3 +63,16 @@ test('getMatches returns full options args on partial input for subcommands', ()
   expect(res).toStrictEqual(exp)
 })
 
+test('getMatches completes full options args on partial input for primitive options', () => {
+  const line = '--do'
+
+  const values = [
+    {values: ['--do']}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['--dot'], line]
+
+  expect(res).toStrictEqual(exp)
+})

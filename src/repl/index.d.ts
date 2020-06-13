@@ -22,4 +22,4 @@ export interface Opt {
   [key: string]: any
 }
 
-export const repl: (parser: (opt?: Opt) => (any?: A) => {errs: Err[], any: B}, commands: Opt) => void
+export const repl: (parser: (opt?: Opt) => (any?: A) => {errs: Err[], args: B}, commands: Opt) => void

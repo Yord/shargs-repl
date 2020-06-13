@@ -1,29 +1,35 @@
-import {getMatches} from './getMatches'
-import {flatMap} from './flatMap'
+const {flatMap} = require('./flatMap')
 
-const completer = (parser, commands) => {
-  const parse = parser(commands)
+const completer = (lexer, cmd, {only = false} = {only: false}) => {
+  const lex = lexer(cmd)
 
   return line => {
-    if (line === '') {
-      const args = flatMap(commands.opts, cmd => cmd.args)
-      return [args, '']
-    }
+    const {opts} = lex(line)
 
-    const {args} = parse(line)
+    const values = justValues(opts)
 
-    const {_, ...subcommands} = args
-
-    let matches = getMatches(commands.opts, subcommands, _)
-
-    if (line[line.length - 1] !== ' ' && matches.length === 1) {
-      matches = matches.map(m => ' ' + m)
-    }
-
-    return [matches, '']
+    return [[], line]
   }
 }
 
 module.exports = {
   completer
+}
+
+function justValues (opts) {
+  return flatMap(opts, opt => {
+    if (Array.isArray(opt.values)) {
+      if (isSubcommand(opt)) {
+        return [{...opt, values: justValues(opt.values)}]
+      } else {
+        return [opt]
+      }
+    } else {
+      return []
+    }
+  })
+}
+
+function isSubcommand ({opts} = {opts: undefined}) {
+  return Array.isArray(opts)
 }

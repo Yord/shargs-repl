@@ -90,3 +90,18 @@ test('getMatches completes full options args on partial input for primitive arra
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches completes full options args on partial input for flag options', () => {
+  const line = '--f'
+
+  const values = [
+    {values: ['--f']}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['--fat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+

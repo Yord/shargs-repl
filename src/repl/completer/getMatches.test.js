@@ -150,3 +150,19 @@ test('getMatches completes full options args on partial input for primitive arra
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches completes full options args on partial input for flag options in subcommands', () => {
+  const line = 'Cat --lo'
+
+  const values = [
+    {...Cat, values: [
+      {values: ['--lo']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Cat --lot'], line]
+
+  expect(res).toStrictEqual(exp)
+})

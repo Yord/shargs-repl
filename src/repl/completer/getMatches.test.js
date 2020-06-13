@@ -216,3 +216,20 @@ test('getMatches returns all cmd args and pos args on --', () => {
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns all subcommand args and pos args with no rest', () => {
+  const line = 'Cat --jet A --lot'
+
+  const values = [
+    {...Cat, values: [
+      {...jet, values: ['A']},
+      {...lot, values: [1]}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['--jet', '--kit', '--lot', '--mad', '--nut'], line]
+
+  expect(res).toStrictEqual(exp)
+})

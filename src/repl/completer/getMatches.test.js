@@ -119,3 +119,18 @@ test('getMatches completes full options args on partial input for subcommands', 
   expect(res).toStrictEqual(exp)
 })
 
+test('getMatches completes full options args on partial input for primitive options in subcommands', () => {
+  const line = 'Cat --je'
+
+  const values = [
+    {...Cat, values: [
+      {values: ['--je']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Cat --jet'], line]
+
+  expect(res).toStrictEqual(exp)
+})

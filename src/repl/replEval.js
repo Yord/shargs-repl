@@ -1,4 +1,4 @@
-const eval = (parser, commands) => {
+const replEval = (parser, commands) => {
   const parse = parser(commands)
 
   return (cmd, context, filename, callback) => {
@@ -22,5 +22,5 @@ const eval = (parser, commands) => {
 }
 
 module.exports = {
-  eval
+  replEval
 }

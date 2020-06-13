@@ -48,3 +48,18 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns full options args on partial input for subcommands', () => {
+  const line = 'Ba'
+
+  const values = [
+    {values: ['Ba']}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+

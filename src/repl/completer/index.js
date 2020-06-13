@@ -1,4 +1,5 @@
-const {flatMap} = require('./flatMap')
+const {flatMap}    = require('./flatMap')
+const {getMatches} = require('./getMatches')
 
 const completer = (lexer, cmd, {only = false} = {only: false}) => {
   const lex = lexer(cmd)
@@ -8,7 +9,7 @@ const completer = (lexer, cmd, {only = false} = {only: false}) => {
 
     const values = justValues(opts)
 
-    return [[], line]
+    return getMatches(line, values, cmd, {only})
   }
 }
 

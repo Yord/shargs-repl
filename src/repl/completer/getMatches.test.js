@@ -134,3 +134,19 @@ test('getMatches completes full options args on partial input for primitive opti
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches completes full options args on partial input for primitive arrays in subcommands', () => {
+  const line = 'Cat --ki'
+
+  const values = [
+    {...Cat, values: [
+      {values: ['--ki']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Cat --kit'], line]
+
+  expect(res).toStrictEqual(exp)
+})

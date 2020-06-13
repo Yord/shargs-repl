@@ -166,3 +166,19 @@ test('getMatches completes full options args on partial input for flag options i
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches uses only to suggest possible value of array option in subcommands', () => {
+  const line = 'Cat --mad'
+
+  const values = [
+    {...Cat, values: [
+      {values: ['--mad']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['A', 'B'], line]
+
+  expect(res).toStrictEqual(exp)
+})

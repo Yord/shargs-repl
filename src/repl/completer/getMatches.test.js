@@ -105,3 +105,17 @@ test('getMatches completes full options args on partial input for flag options',
   expect(res).toStrictEqual(exp)
 })
 
+test('getMatches completes full options args on partial input for subcommands', () => {
+  const line = 'Ba'
+
+  const values = [
+    {values: ['Ba']}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+

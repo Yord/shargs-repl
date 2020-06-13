@@ -34,3 +34,17 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns all cmd args and pos args on unknown input', () => {
+  const line = 'cvbnkl'
+
+  const values = [
+    {values: ['cvbnkl']}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', '<3>', '<4> <5>', 'INK'], line]
+
+  expect(res).toStrictEqual(exp)
+})

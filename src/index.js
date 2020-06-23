@@ -1,5 +1,7 @@
-const {repl} = require('./repl')
+const {repl, replF, replSync} = require('./repl')
 
 module.exports = {
-  repl
+  repl,
+  replF,
+  replSync
 }

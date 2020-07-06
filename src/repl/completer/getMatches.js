@@ -16,7 +16,7 @@ function getMatches (line, values, cmd, {only}) {
       const matches = summarize(cmd2)
       return match(matches, line)
     }
-  
+
     // 3. If rest is -- display all command options
     if (rest === '--') {
       const matches = summarize(cmd)
@@ -24,7 +24,7 @@ function getMatches (line, values, cmd, {only}) {
     }
   
     let matches = []
-  
+
     // 4. Check if rest is args in any of the stack commands (from right to left)
     //    -> if args of subcommand, show all its opts
     //    -> if args is option, show its only field or empty if missing
@@ -52,8 +52,8 @@ function getMatches (line, values, cmd, {only}) {
     }
   
     if (matches.length > 0) return match(matches, line)
-  
-    // 5. If not, check if rest is start of args in any of the stack commands (from right to left)
+
+    // 5. Check if rest is start of args in any of the stack commands (from right to left)
     //    -> if yes, matches are all right-most args that start with rest
     for (let i = cmdStack.length - 1; i >= 0; i--) {
       const cmd2 = cmdStack[i]
@@ -71,8 +71,20 @@ function getMatches (line, values, cmd, {only}) {
     }
   
     if (matches.length > 0) return complete(matches, line, rest)
-  
-    // 6. If not, 
+
+    // 6. Check if the first positional argument has only values and the rest fits some values from only
+    if (only === true) {
+      const cmd = cmdStack[cmdStack.length - 1]
+      const firstPosArg = cmd.opts.find(isPosArg)
+
+      if (typeof firstPosArg !== 'undefined' && Array.isArray(firstPosArg.only)) {
+        matches = firstPosArg.only.filter(value => value.startsWith(rest))
+      }
+    }
+
+    if (matches.length > 0) return complete(matches, line, rest)
+
+    // 7. Otherwise
     //    -> Matches are first non-required pos arg of rightmost command without values, or any subcommand of any of the stack commands 
     for (let i = cmdStack.length - 1; i >= 0; i--) {
       const cmd2 = cmdStack[i]
@@ -93,8 +105,56 @@ function getMatches (line, values, cmd, {only}) {
   }
   
   function complete (matches, line, rest) {
-    if (matches.length === 1) return [[line.slice(0, line.length - rest.length) + matches[0]], line]
-    return [matches, line]
+    if (matches.length === 1) {
+      return [
+        [line.slice(0, line.length - rest.length) + matches[0]],
+        line
+      ]
+    }
+
+    const substr = shortestCommonSubstring(matches)
+
+    if (rest !== substr) {
+      return [
+        [line.slice(0, line.length - rest.length) + substr],
+        line
+      ]
+    }
+
+    return [
+      matches,
+      line.slice(0, line.length - rest.length) + substr
+    ]
+  }
+
+  function shortestCommonSubstring (matches) {
+    if (matches.length === 0) return ''
+
+    let shortest = matches[0]
+    for (let i = 1; i < matches.length; i++) {
+      const match = matches[i]
+      
+      if (match.length < shortest.length) {
+        shortest = match
+      }
+    }
+
+    let substr = ''
+
+    shortestLoop: for (let i = 0; i < shortest.length; i++) {
+      const ch = shortest[i]
+
+      for (let j = 0; j < matches.length; j++) {
+        const match = matches[j]
+        const ch2 = match[i]
+
+        if (ch !== ch2) break shortestLoop
+      }
+
+      substr += ch
+    }
+
+    return substr
   }
   
   function getCmdStack (cmd, values) {
@@ -124,9 +184,14 @@ function getMatches (line, values, cmd, {only}) {
   
     switch (true) {
       case isSubcommand(opt): return getRest(opt.values || [])
+      case isPosArg(opt):     return opt.values[0]
       case isRest(opt):       return opt.values[0]
       default:                return null
     }
+  }
+
+  function isPosArg ({args}) {
+    return !Array.isArray(args)
   }
   
   function isRest (opt) {

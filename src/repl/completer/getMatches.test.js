@@ -176,6 +176,22 @@ test('getMatches completes full options args on partial input with shortest comm
   expect(res).toStrictEqual(exp)
 })
 
+test('getMatches completes full options args on partial input for primitive positional arguments in subcommands', () => {
+  const line = 'Cat OA'
+
+  const values = [
+    {...Cat, values: [
+      {values: ['OA']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Cat OAK'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
 test('getMatches uses only to suggest possible value of array option in subcommands', () => {
   const line = 'Cat --mad'
 

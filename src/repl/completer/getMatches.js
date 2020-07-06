@@ -17,8 +17,8 @@ function getMatches (line, values, cmd, {only}) {
       return match(matches, line)
     }
 
-    // 3. If rest is -- display all command options
-    if (rest === '--') {
+    // 3. If line ends with "-- " display all command options
+    if (line.endsWith('-- ')) {
       const matches = summarize(cmd)
       return match(matches, line)
     }

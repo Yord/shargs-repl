@@ -9,7 +9,13 @@ const Cat = {key: 'Cat', args: ['Cat'], opts: [
   {key: 'kit', args: ['--kit'], types: ['7', '8']},
   lot,
   {key: 'mad', args: ['--mad'], types: ['9', '10'], only: ['A', 'B']},
-  {key: 'nut', args: ['--nut'], types: ['9', '10'], only: ['C']}
+  {key: 'nut', args: ['--nut'], types: ['9', '10'], only: ['C']},
+  {key: 'oak', types: ['11'], only: ['OAK']}
+]}
+
+const Put = {key: 'Put', args: ['Put'], opts: [
+  {key: 'quo', args: ['--quo']},
+  {key: 'rat', args: ['--rat']}
 ]}
 
 const cmd = {key: 'Arc', opts: [
@@ -18,9 +24,10 @@ const cmd = {key: 'Arc', opts: [
   {key: 'dot', args: ['-d', '--dot'], types: ['1']},
   {key: 'eat', args: ['-e', '--eat'], types: ['1', '2']},
   {key: 'fat', args: ['--fat'], types: []},
-  {key: 'gut', types: ['3']},
+  {key: 'gut', types: ['3'], only: ['GUT']},
   {key: 'hat', types: ['4', '5']},
-  {key: 'ink', descArg: 'INK'}
+  {key: 'ink', descArg: 'INK'},
+  Put
 ]}
 
 test('getMatches returns all cmd args and pos args on unknown input', () => {
@@ -30,7 +37,7 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', '<3>', '<4> <5>', 'INK'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -44,7 +51,7 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', '<3>', '<4> <5>', 'INK'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -105,20 +112,6 @@ test('getMatches completes full options args on partial input for flag options',
   expect(res).toStrictEqual(exp)
 })
 
-test('getMatches completes full options args on partial input for subcommands', () => {
-  const line = 'Ba'
-
-  const values = [
-    {values: ['Ba']}
-  ]
-
-  const res = getMatches(line, values, cmd, {only: true})
-
-  const exp = [['Bat'], line]
-
-  expect(res).toStrictEqual(exp)
-})
-
 test('getMatches completes full options args on partial input for primitive options in subcommands', () => {
   const line = 'Cat --je'
 
@@ -163,6 +156,38 @@ test('getMatches completes full options args on partial input for flag options i
   const res = getMatches(line, values, cmd, {only: true})
 
   const exp = [['Cat --lot'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches completes full options args on partial input with shortest common substring', () => {
+  const line = 'Put -'
+
+  const values = [
+    {...Put, values: [
+      {values: ['-']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Put --'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches completes full options args on partial input for primitive positional arguments in subcommands', () => {
+  const line = 'Cat OA'
+
+  const values = [
+    {...Cat, values: [
+      {values: ['OA']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Cat OAK'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -212,7 +237,7 @@ test('getMatches returns all cmd args and pos args on --', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', '<3>', '<4> <5>', 'INK'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -229,24 +254,7 @@ test('getMatches returns all subcommand args and pos args with no rest', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['--jet', '--kit', '--lot', '--mad', '--nut'], line]
-
-  expect(res).toStrictEqual(exp)
-})
-
-test('getMatches returns all subcommand args and pos args with no rest', () => {
-  const line = 'Cat --jet A --lot'
-
-  const values = [
-    {...Cat, values: [
-      {...jet, values: ['A']},
-      {...lot, values: [1]}
-    ]}
-  ]
-
-  const res = getMatches(line, values, cmd, {only: true})
-
-  const exp = [['--jet', '--kit', '--lot', '--mad', '--nut'], line]
+  const exp = [['--jet', '--kit', '--lot', '--mad', '--nut', 'OAK'], line]
 
   expect(res).toStrictEqual(exp)
 })

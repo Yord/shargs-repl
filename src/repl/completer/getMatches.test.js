@@ -224,8 +224,8 @@ test('getMatches uses only to complete value of array option in subcommands', ()
   expect(res).toStrictEqual(exp)
 })
 
-test('getMatches returns all cmd args and pos args on --', () => {
-  const line = 'Cat --jet A --lot --'
+test('getMatches returns all cmd args and pos args on "-- "', () => {
+  const line = 'Cat --jet A --lot -- '
 
   const values = [
     {...Cat, values: [

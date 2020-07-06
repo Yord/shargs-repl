@@ -160,6 +160,22 @@ test('getMatches completes full options args on partial input for flag options i
   expect(res).toStrictEqual(exp)
 })
 
+test('getMatches completes full options args on partial input with shortest common substring', () => {
+  const line = 'Put -'
+
+  const values = [
+    {...Put, values: [
+      {values: ['-']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Put --'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
 test('getMatches uses only to suggest possible value of array option in subcommands', () => {
   const line = 'Cat --mad'
 

@@ -22,4 +22,17 @@ export interface Opt {
   [key: string]: any
 }
 
-export const repl: (parser: (opt?: Opt) => (any?: A) => {errs: Err[], args: B}, commands: Opt) => void
+export interface Options {
+  only?: boolean
+  defaultAction?: (value: any, errs: Err[]) => void
+  prompt?: string
+  eval?: (cmd: any, context: any, filename: any, callback: any) => any,
+  completer?: (line: string) => [string[], string]
+}
+
+export const repl: (
+  lexer:  (opt?: Opt) => (any?: A) => {errs: Err[], opts: Opt[]},
+  parser: (opt?: Opt) => (any?: A) => {errs: Err[], args: B},
+  commands: Opt,
+  options: Options
+) => void

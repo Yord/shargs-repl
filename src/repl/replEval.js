@@ -6,6 +6,10 @@ const replEvalF = mode => (parser, commands, defaultAction) => {
   return (cmd, context, filename, callback) => {
     const {errs, args} = parse(cmd)
 
+    if (Object.values(args).length === 0) {
+      defaultAction({cmd}, errs)
+    }
+
     const results = Object.entries(args).map(([key, value]) => {
       const cmd = commands.opts.find(_ => _.args.includes(key)) || { action: defaultAction }
       const action = cmd.action || defaultAction

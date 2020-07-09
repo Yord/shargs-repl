@@ -8,7 +8,7 @@ const Cat = {key: 'Cat', args: ['Cat'], opts: [
   jet,
   {key: 'kit', args: ['--kit'], types: ['7', '8']},
   lot,
-  {key: 'mad', args: ['--mad'], types: ['9', '10'], only: ['A', 'B']},
+  {key: 'mad', args: ['--mad'], types: ['9', '10'], only: ['AAA', 'ABB']},
   {key: 'nut', args: ['--nut'], types: ['9', '10'], only: ['C']},
   {key: 'oak', types: ['11'], only: ['OAK']}
 ]}
@@ -203,7 +203,7 @@ test('getMatches uses only to suggest possible value of array option in subcomma
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['A', 'B'], line]
+  const exp = [['AAA', 'ABB'], line]
 
   expect(res).toStrictEqual(exp)
 })

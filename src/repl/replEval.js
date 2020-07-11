@@ -1,4 +1,5 @@
-const {pipe} = require('./pipe')
+const {UnknownCommand} = require('./errors')
+const {pipe}           = require('./pipe')
 
 const replEvalF = mode => (parser, commands, defaultAction) => {
   const parse = parser(commands)
@@ -39,12 +40,4 @@ const replEvalF = mode => (parser, commands, defaultAction) => {
 
 module.exports = {
   replEvalF
-}
-
-function UnknownCommand ({cmd}) {
-  return {
-    code: 'UnknownCommand',
-    msg:  'The provided command is not a REPL command.',
-    info: {cmd}
-  }
 }

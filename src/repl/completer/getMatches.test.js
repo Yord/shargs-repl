@@ -210,6 +210,22 @@ test('getMatches uses only to suggest possible value of array option in subcomma
   expect(res).toStrictEqual(exp)
 })
 
+test('getMatches uses only values to suggest possible value of array option in subcommands 1', () => {
+  const line = 'Cat --mad A'
+
+  const values = [
+    {...Cat, values: [
+      {...mad, values: ['A']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Cat --mad AA'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
 test('getMatches uses only to complete value of array option in subcommands', () => {
   const line = 'Cat --nut'
 

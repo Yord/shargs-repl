@@ -1,4 +1,5 @@
-const {pipe} = require('./pipe')
+const {UnknownCommand} = require('./errors')
+const {pipe}           = require('./pipe')
 
 const replEvalF = mode => (parser, commands, defaultAction) => {
   const parse = parser(commands)
@@ -6,15 +7,27 @@ const replEvalF = mode => (parser, commands, defaultAction) => {
   return (cmd, context, filename, callback) => {
     const {errs, args} = parse(cmd)
 
-    if (Object.values(args).length === 0) {
+    if (args._.length > 0) {
+      args._.map(cmd =>
+        errs.push(UnknownCommand({cmd}))
+      )
+    }
+
+    const entries = Object.entries(args).filter(([key]) => key !== '_')
+
+    if (entries.length === 0) {
       defaultAction({cmd}, errs)
     }
 
-    const results = Object.entries(args).map(([key, value]) => {
+    const results = entries.map(([key, value]) => {
       const cmd = commands.opts.find(_ => _.args.includes(key)) || { action: defaultAction }
       const action = cmd.action || defaultAction
 
-      return typeof action === 'undefined' ? mode.resolve() : mode.resolve(action(value, errs))
+      if (typeof action === 'undefined') {
+        return mode.resolve()
+      } else {
+        return mode.resolve(action(value, errs))
+      }
     })
 
     return pipe(

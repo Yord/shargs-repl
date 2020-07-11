@@ -4,11 +4,13 @@ const jet = {key: 'jet', args: ['--jet'], types: ['6']}
 
 const lot = {key: 'lot', args: ['--lot'], types: []}
 
+const mad = {key: 'mad', args: ['--mad'], types: ['9', '10'], only: ['AAA', 'AAB']}
+
 const Cat = {key: 'Cat', args: ['Cat'], opts: [
   jet,
   {key: 'kit', args: ['--kit'], types: ['7', '8']},
   lot,
-  {key: 'mad', args: ['--mad'], types: ['9', '10'], only: ['A', 'B']},
+  mad,
   {key: 'nut', args: ['--nut'], types: ['9', '10'], only: ['C']},
   {key: 'oak', types: ['11'], only: ['OAK']}
 ]}
@@ -203,7 +205,39 @@ test('getMatches uses only to suggest possible value of array option in subcomma
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['A', 'B'], line]
+  const exp = [['AAA', 'AAB'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches uses only values to suggest possible value of array option in subcommands 1', () => {
+  const line = 'Cat --mad A'
+
+  const values = [
+    {...Cat, values: [
+      {...mad, values: ['A']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['Cat --mad AA'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches uses only values to suggest possible value of array option in subcommands 2', () => {
+  const line = 'Cat --mad AA'
+
+  const values = [
+    {...Cat, values: [
+      {...mad, values: ['AA']}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['AAA', 'AAB'], line]
 
   expect(res).toStrictEqual(exp)
 })

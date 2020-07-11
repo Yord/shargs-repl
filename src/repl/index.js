@@ -10,19 +10,22 @@ const replF = mode => (
   commands,
   {
     only = false,
-    defaultAction = (value, errs) => {}
+    defaultAction = (value, errs) => {},
+    prompt = undefined,
+    eval: replEval = undefined,
+    completer: _completer = undefined
   } = {
     only: false,
-    defaultAction : (value, errs) => {}
+    defaultAction: (value, errs) => {},
   }
 ) => {
   console.log(commands.desc ? commands.desc + '\n' : '')
 
   nodeRepl.start({
-    prompt: `${commands.key}~$ `,
     ignoreUndefined: true,
-    eval: replEvalF(mode)(parser, commands, defaultAction),
-    completer: completer(lexer, commands, {only})
+    prompt:    typeof prompt     === 'string'   ? prompt     : `${commands.key}~$ `,
+    eval:      typeof replEval   === 'function' ? replEval   : replEvalF(mode)(parser, commands, defaultAction),
+    completer: typeof _completer === 'function' ? _completer : completer(lexer, commands, {only})
   })
 }
 

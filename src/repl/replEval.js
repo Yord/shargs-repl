@@ -7,8 +7,10 @@ const replEvalF = mode => (parser, commands, defaultAction) => {
   return (cmd, context, filename, callback) => {
     const {errs, args} = parse(cmd)
 
-    if (args._.length > 0) {
-      args._.map(cmd =>
+    const _ = args._ || []
+
+    if (_.length > 0) {
+      _.map(cmd =>
         errs.push(UnknownCommand({cmd}))
       )
     }

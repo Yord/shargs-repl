@@ -10,9 +10,22 @@ function getMatches (line, values, cmd, {only}) {
   const cmdStack = getCmdStack(cmd, values)
   const rest     = getRest(values)
 
-  // 2. If last value is command and not rest, show args of last command
+  // 2. If last value is not rest
   if (rest === null) {
     const cmd2 = cmdStack[cmdStack.length - 1]
+
+    // 2.a. If only is true and last option of last command is invalid (its only does not contain its values)
+    if (only && Array.isArray(cmd2.values) && cmd2.values.length > 0) {
+      const lastOpt = cmd2.values[cmd2.values.length - 1]
+      const rest    = lastOpt.values[lastOpt.values.length - 1]
+
+      if (lastOpt.only && !lastOpt.only.includes(rest)) {
+        const matches = lastOpt.only.filter(val => val.startsWith(rest))
+        return complete(matches, line, rest)
+      }
+    }
+
+    // 2.b. Else show args of last command
     const matches = summarize(cmd2)
     return match(matches, line)
   }

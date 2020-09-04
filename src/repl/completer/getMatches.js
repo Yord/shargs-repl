@@ -91,7 +91,7 @@ function getMatches (line, values, cmd, {only}) {
     const firstPosArg = cmd.opts.find(isPosArg)
 
     if (typeof firstPosArg !== 'undefined' && Array.isArray(firstPosArg.only)) {
-      matches = firstPosArg.only.filter(value => value.startsWith(rest))
+      matches = firstPosArg.only.filter(value => value !== rest && value.startsWith(rest))
     }
   }
 

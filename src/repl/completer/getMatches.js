@@ -216,8 +216,8 @@ function summarize (cmd) {
 }
 
 function argName ({key, types, only, descArg}) {
-  if (typeof descArg === 'string') return [descArg]
   if (Array.isArray(only)) return only
+  if (typeof descArg === 'string') return [descArg]
   if (Array.isArray(types) && types.length > 0) return [types.map(type => `<${type}>`).join(' ')]
   return [`<${key}>`]
 }

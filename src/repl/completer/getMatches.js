@@ -197,14 +197,14 @@ function getRest (values) {
 
   switch (true) {
     case isSubcommand(opt): return getRest(opt.values || [])
-    case isPosArg(opt):     return opt.values[0]
+    case isPosArg(opt):     return null
     case isRest(opt):       return opt.values[0]
     default:                return null
   }
 }
 
-function isPosArg ({args}) {
-  return !Array.isArray(args)
+function isPosArg ({key, args}) {
+  return typeof key === 'string' && !Array.isArray(args)
 }
 
 function isRest (opt) {

@@ -383,3 +383,28 @@ test('getMatches returns only the second positional argument if the first is alr
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns only the second positional argument if the first is already present in a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = 'foo'
+
+  const values = [
+    {...posA, values: ['foo']},
+    posB,
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})

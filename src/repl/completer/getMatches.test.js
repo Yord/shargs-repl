@@ -317,3 +317,36 @@ test('getMatches returns only first positional argument if the line is empty', (
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns only first positional argument if the line is empty in a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const sub = {
+    key: 'sub',
+    args: ['sub'],
+    opts: [posA, posB, posC]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [sub]
+  }
+
+  const line = 'sub'
+
+  const values = [
+    {...sub, values: [
+      posA,
+      posB,
+      posC
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['foo', 'bar'], line]
+
+  expect(res).toStrictEqual(exp)
+})

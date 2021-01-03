@@ -441,3 +441,28 @@ test('getMatches returns only the second positional argument if the first is alr
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns only the first positional argument if the first is already present, but is variadic', () => {
+  const posA = {key: 'posA', only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = 'foo'
+
+  const values = [
+    {...posA, values: ['foo']},
+    posB,
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['foo', 'bar'], line]
+
+  expect(res).toStrictEqual(exp)
+})

@@ -499,3 +499,28 @@ test('getMatches returns only the first positional argument if the first is alre
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns only the third positional argument if the first and second are already present', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = 'foo baz'
+
+  const values = [
+    {...posA, values: ['foo']},
+    {...posB, values: ['baz']},
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['bam', 'ban'], line]
+
+  expect(res).toStrictEqual(exp)
+})

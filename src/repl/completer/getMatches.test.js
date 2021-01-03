@@ -615,3 +615,44 @@ test('getMatches returns only the second positional argument if the first and se
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns only the second positional argument if the first and second are already present, but the second is variadic, in a subcommand of a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const subB = {
+    key: 'subB',
+    args: ['subB'],
+    opts: [posA, posB, posC]
+  }
+
+  const subA = {
+    key: 'subA',
+    args: ['subA'],
+    opts: [subB]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [subA]
+  }
+
+  const line = 'subA subB foo baz'
+
+  const values = [
+    {...subA, values: [
+      {...subB, values: [
+        {...posA, values: ['foo']},
+        {...posB, values: ['baz']},
+        posC
+      ]}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})

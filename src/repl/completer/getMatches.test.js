@@ -292,3 +292,28 @@ test('getMatches returns all subcommand args and pos args with no rest', () => {
 
   expect(res).toStrictEqual(exp)
 })
+
+test('getMatches returns only first positional argument if the line is empty', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = ''
+
+  const values = [
+    posA,
+    posB,
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['foo', 'bar'], line]
+
+  expect(res).toStrictEqual(exp)
+})

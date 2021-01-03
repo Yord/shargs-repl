@@ -39,7 +39,7 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'Put', 'GUT'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -53,7 +53,7 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'Put', 'GUT'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -271,7 +271,7 @@ test('getMatches returns all cmd args and pos args on "-- "', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'Put', 'GUT'], line]
 
   expect(res).toStrictEqual(exp)
 })

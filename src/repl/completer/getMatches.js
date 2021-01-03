@@ -1,9 +1,14 @@
 const {flatMap} = require('./flatMap')
 
-function getMatches (line, values, cmd, {only}) {
-  // 1. If line is empty, return all args and pos arg of command
+function getMatches (line, opts, cmd, {only}) {
+  const values = justValues(opts)
+
+  // 1. If line is empty
   if (line === '') {
-    const matches = summarize(cmd)
+    // 1.a. If the command only consists of pos args and the first pos arg has an only value
+    // ...
+    // 2.b. Else return all args and (the first) pos arg of command
+    const matches = summarize(cmd, values)
     return match(matches, line)
   }
 
@@ -26,13 +31,13 @@ function getMatches (line, values, cmd, {only}) {
     }
 
     // 2.b. Else show args of last command
-    const matches = summarize(cmd2)
+    const matches = summarize(cmd2, values)
     return match(matches, line)
   }
 
   // 3. If line ends with "-- " display all command options
   if (line.endsWith('-- ')) {
-    const matches = summarize(cmd)
+    const matches = summarize(cmd, values)
     return match(matches, line)
   }
 
@@ -51,7 +56,7 @@ function getMatches (line, values, cmd, {only}) {
 
     if (optsWithRestArg.length > 0) {
       matches = flatMap(optsWithRestArg, opt => {
-        if (isSubcommand(opt)) return summarize(opt)
+        if (isSubcommand(opt)) return summarize(opt, values)
         else {
           if (opt.descArg) return [opt.descArg]
           if (only === true && opt.only) return opt.only
@@ -101,7 +106,7 @@ function getMatches (line, values, cmd, {only}) {
   //    -> Matches are first non-required pos arg of rightmost command without values, or any subcommand of any of the stack commands 
   for (let i = cmdStack.length - 1; i >= 0; i--) {
     const cmd2 = cmdStack[i]
-    const args = summarize(cmd2)
+    const args = summarize(cmd2, values)
     matches = [...matches, ...args]
   }
 
@@ -211,8 +216,32 @@ function isRest (opt) {
   return Object.keys(opt).length === 1 && Array.isArray(opt.values) && opt.values.length === 1
 }
 
-function summarize (cmd) {
-  return flatMap(cmd.opts || [], opt => opt.args ? opt.args : argName(opt))
+function isVariadic ({types}) {
+  return typeof types === 'undefined'
+}
+
+function summarize (cmd, values) {
+  const innerValues = values => {
+    if (values.length > 0) {
+      if (isSubcommand(values[0])) {
+        return innerValues(values[0].values)
+      } else {
+        return values
+      }
+    } else {
+      return values
+    }
+  }
+
+  const firstEmptyPosArg = (cmd.opts || []).find(
+    opt => isPosArg(opt) && (isVariadic(opt) || !innerValues(values).find(({key}) => opt.key === key))
+  )
+  const options = (cmd.opts || []).filter(opt => !isPosArg(opt))
+
+  return flatMap(
+    [...options, ...(firstEmptyPosArg ? [firstEmptyPosArg] : [])],
+    opt => opt.args ? opt.args : argName(opt)
+  )
 }
 
 function argName ({key, types, only, descArg}) {
@@ -220,4 +249,18 @@ function argName ({key, types, only, descArg}) {
   if (typeof descArg === 'string') return [descArg]
   if (Array.isArray(types) && types.length > 0) return [types.map(type => `<${type}>`).join(' ')]
   return [`<${key}>`]
+}
+
+function justValues (opts) {
+  return flatMap(opts, opt => {
+    if (Array.isArray(opt.values)) {
+      if (isSubcommand(opt)) {
+        return [{...opt, values: justValues(opt.values)}]
+      } else {
+        return [opt]
+      }
+    } else {
+      return []
+    }
+  })
 }

@@ -39,7 +39,7 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'Put', 'GUT'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -53,7 +53,7 @@ test('getMatches returns all cmd args and pos args on unknown input', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'Put', 'GUT'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -271,7 +271,7 @@ test('getMatches returns all cmd args and pos args on "-- "', () => {
 
   const res = getMatches(line, values, cmd, {only: true})
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'GUT', '<4> <5>', 'INK', 'Put'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', 'Put', 'GUT'], line]
 
   expect(res).toStrictEqual(exp)
 })
@@ -289,6 +289,370 @@ test('getMatches returns all subcommand args and pos args with no rest', () => {
   const res = getMatches(line, values, cmd, {only: true})
 
   const exp = [['--jet', '--kit', '--lot', '--mad', '--nut', 'OAK'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only first positional argument if the line is empty', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = ''
+
+  const values = [
+    posA,
+    posB,
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['foo', 'bar'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only first positional argument if the line is empty in a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const sub = {
+    key: 'sub',
+    args: ['sub'],
+    opts: [posA, posB, posC]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [sub]
+  }
+
+  const line = 'sub'
+
+  const values = [
+    {...sub, values: [
+      posA,
+      posB,
+      posC
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['foo', 'bar'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the second positional argument if the first is already present', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const sub = {
+    key: 'sub',
+    args: ['sub'],
+    opts: [posA, posB, posC]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [sub]
+  }
+
+  const line = 'sub foo'
+
+  const values = [
+    {...sub, values: [
+      {...posA, values: ['foo']},
+      posB,
+      posC
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the second positional argument if the first is already present in a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = 'foo'
+
+  const values = [
+    {...posA, values: ['foo']},
+    posB,
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the second positional argument if the first is already present in a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const sub = {
+    key: 'sub',
+    args: ['sub'],
+    opts: [posA, posB, posC]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [sub]
+  }
+
+  const line = 'sub foo'
+
+  const values = [
+    {...sub, values: [
+      {...posA, values: ['foo']},
+      posB,
+      posC
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the first positional argument if the first is already present, but is variadic', () => {
+  const posA = {key: 'posA', only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = 'foo'
+
+  const values = [
+    {...posA, values: ['foo']},
+    posB,
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['foo', 'bar'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the first positional argument if the first is already present, but is variadic, in a subcommand', () => {
+  const posA = {key: 'posA', only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const sub = {
+    key: 'sub',
+    args: ['sub'],
+    opts: [posA, posB, posC]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [sub]
+  }
+
+  const line = 'sub foo'
+
+  const values = [
+    {...sub, values: [
+      {...posA, values: ['foo']},
+      posB,
+      posC
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['foo', 'bar'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the third positional argument if the first and second are already present', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = 'foo baz'
+
+  const values = [
+    {...posA, values: ['foo']},
+    {...posB, values: ['baz']},
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['bam', 'ban'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the third positional argument if the first and second are already present in a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', types: ['string'], only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const sub = {
+    key: 'sub',
+    args: ['sub'],
+    opts: [posA, posB, posC]
+  }
+  
+  const cmd = {
+    key: 'posArgs',
+    opts: [sub]
+  }
+
+  const line = 'sub foo baz'
+
+  const values = [
+    {...sub, values: [
+      {...posA, values: ['foo']},
+      {...posB, values: ['baz']},
+      posC
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['bam', 'ban'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the second positional argument if the first and second are already present, but the second is variadic', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [posA, posB, posC]
+  }
+
+  const line = 'foo baz'
+
+  const values = [
+    {...posA, values: ['foo']},
+    {...posB, values: ['baz']},
+    posC
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the second positional argument if the first and second are already present, but the second is variadic, in a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const sub = {
+    key: 'sub',
+    args: ['sub'],
+    opts: [posA, posB, posC]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [sub]
+  }
+
+  const line = 'sub foo baz'
+
+  const values = [
+    {...sub, values: [
+      {...posA, values: ['foo']},
+      {...posB, values: ['baz']},
+      posC
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
+
+  expect(res).toStrictEqual(exp)
+})
+
+test('getMatches returns only the second positional argument if the first and second are already present, but the second is variadic, in a subcommand of a subcommand', () => {
+  const posA = {key: 'posA', types: ['string'], only: ['foo', 'bar']}
+  const posB = {key: 'posB', only: ['baz', 'bat']}
+  const posC = {key: 'posC', types: ['string'], only: ['bam', 'ban']}
+
+  const subB = {
+    key: 'subB',
+    args: ['subB'],
+    opts: [posA, posB, posC]
+  }
+
+  const subA = {
+    key: 'subA',
+    args: ['subA'],
+    opts: [subB]
+  }
+
+  const cmd = {
+    key: 'posArgs',
+    opts: [subA]
+  }
+
+  const line = 'subA subB foo baz'
+
+  const values = [
+    {...subA, values: [
+      {...subB, values: [
+        {...posA, values: ['foo']},
+        {...posB, values: ['baz']},
+        posC
+      ]}
+    ]}
+  ]
+
+  const res = getMatches(line, values, cmd, {only: true})
+
+  const exp = [['baz', 'bat'], line]
 
   expect(res).toStrictEqual(exp)
 })

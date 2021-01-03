@@ -23,7 +23,7 @@ const cmd = {key: 'Arc', opts: [
   {key: 'ink', descArg: 'INK'}
 ]}
 
-test('completer returns all cmd args and pos args for empty line', () => {
+test('completer returns all cmd args and first pos arg for empty line', () => {
   const line = ''
 
   const lexer = () => () => ({
@@ -33,7 +33,7 @@ test('completer returns all cmd args and pos args for empty line', () => {
 
   const res = completer(lexer, cmd, {only: true})(line)
 
-  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', '<3>', '<4> <5>', 'INK'], line]
+  const exp = [['Bat', 'Cat', '-d', '--dot', '-e', '--eat', '--fat', '<3>'], line]
 
   expect(res).toStrictEqual(exp)
 })
